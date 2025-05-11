@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View TECH ITEMS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Side Navigation Menu -->
+        <nav class="side-menu">
+            <h2>Inventory Dashboard</h2>
+            <ul>
+                <li class="menu-section">
+                    <span>View</span>
+                    <ul class="submenu">
+                        <li><a href="history.html">History</a></li>
+                        <li><a href="weapons-view.html" class="active">Weapons</a></li>
+                        <li><a href="items-view.html">Items</a></li>
+                        <li><a href="tech-view.html">Tech</a></li>
+                    </ul>
+                </li>
+                <li class="menu-section">
+                    <span>Return</span>
+                    <ul class="submenu">
+                        <li><a href="#weapons-return">Weapons</a></li>
+                        <li><a href="#items-return">Items</a></li>
+                        <li><a href="#tech-return">Tech</a></li>
+                    </ul>
+                </li>
+                <li class="menu-section">
+                    <span>Issue</span>
+                    <ul class="submenu">
+                        <li><a href="#weapons-issue">Weapons</a></li>
+                        <li><a href="#items-issue">Items</a></li>
+                        <li><a href="#tech-issue">Tech</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <h1>View TECH ITEMS</h1>
+            <button onclick="location.href='show-returned.html'">Show Returned Items</button>
+            <button onclick="location.href='show-issued.html'">Show Issued Items</button>
+            <button onclick="location.href='edit-items.html'">Edit Items</button>
+        </div>
+    </div>
+</body>
+</html>
