@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Savings Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);  /* 2 columns */
+            gap: 20px;  /* Space between grid items */
+            margin-top: 20px;
+        }
+        .img-container {
+            text-align: center;
+            overflow: hidden;  /* Hide overflow for zoom effect */
+        }
+        .img-container img {
+            width: 100%;  /* Responsive image */
+            height: auto; /* Maintain aspect ratio */
+            transition: transform 0.2s;  /* Smooth transition for scaling */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Cost Savings Analysis</h1>
+    <div class="grid-container">
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='bar_plot.png') }}" alt="Cost Savings Per Model">
+        </div>
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='cumulative_savings.png') }}" alt="Cumulative Savings Over Models">
+        </div>
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='pie_chart.png') }}" alt="Proportion of Savings Across Models">
+        </div>
+        <div class="img-container">
+            <img src="{{ url_for('static', filename='heatmap.png') }}" alt="Savings Breakdown Heatmap">
+        </div>
+    </div>
+</body>
+</html>

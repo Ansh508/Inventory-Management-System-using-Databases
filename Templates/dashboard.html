@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Department Hardware Inventory Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main_styles.css') }}">
+    <style>
+        /* Flash messages styling */
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+            color: #3c763d;
+        }
+
+        .alert-danger {
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            color: #a94442;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);  /* 2 columns */
+            gap: 20px;  /* Space between grid items */
+            margin-top: 20px;
+        }
+
+        .img-container {
+            text-align: center;
+            overflow: hidden;  /* Hide overflow for zoom effect */
+        }
+
+        .img-container img {
+            width: 100%;  /* Responsive image */
+            height: auto; /* Maintain aspect ratio */
+            transition: transform 0.2s;  /* Smooth transition for scaling */
+        }
+
+        /* Hide plots initially */
+        #plots {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Flash messages section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span class="flash-close">&times;</span>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+
+        <!-- Side Navigation Menu -->
+        <nav class="side-menu">
+            <h1>Inventory Dashboard</h1>
+            <ul>
+                <li class="menu-section">
+                    <span>View</span>
+                    <ul class="submenu">
+                        <li><a href="{{ url_for('view_table', table_name='history') }}">History</a></li>
+                        <li><a href="{{ url_for('view_table', table_name='weapons') }}">Weapons</a></li>
+                        <li><a href="{{ url_for('view_table', table_name='items') }}">Items</a></li>
+                        <li><a href="{{ url_for('view_table', table_name='technical_items') }}">Tech</a></li>
+                    </ul>
+                </li>
+                <li class="menu-section">
+                    <span>Issue</span>
+                    <ul class="submenu">
+                        <li><a href="#weapons-issue">Weapons</a></li>
+                        <li><a href="#items-issue">Items</a></li>
+                        <li><a href="#tech-issue">Tech</a></li>
+                    </ul>
+                </li>
+                <li class="menu-section">
+                    <span>Return</span>
+                    <ul class="submenu">
+                        <li><a href="#weapons-return">Weapons</a></li>
+                        <li><a href="#items-return">Items</a></li>
+                        <li><a href="#tech-return">Tech</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-section">
+                    <span>Maintenance</span>
+                    <ul class="submenu">
+                        <li><a href="{{ url_for('view_table', table_name='weapons_maintenance') }}">Weapons</a></li>
+                        <li><a href="{{ url_for('view_table', table_name='items_maintenance') }}">Items</a></li>
+                        <li><a href="{{ url_for('view_table', table_name='technical_items_maintenance') }}">Tech</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-section">
+                    <span>Funds</span>
+                    <ul class="submenu">
+                        <li><a href="javascript:void(0);" onclick="showPlots()">Fund Analysis</a></li>
+                        <li><a href="#items-return">Budget Forecasting</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+
+            <!-- Dynamically Rendered Table Here -->
+            {% if table_name %}
+                
+                <h1>{{ table_name | capitalize }}</h1>  <!-- Dynamically display table name like "Items" -->
+
+                <!-- Edit Table Button -->
+                <button id="edit-btn">Edit Table</button>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                {% for column in column_names %}
+                                    <th>{{ column }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in table_data %}
+                                <tr>
+                                    {% for cell in row %}
+                                        <td>{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Edit Modal -->
+                <div id="edit-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3>Edit {{ table_name | capitalize }}</h3>
+                        
+                        <div class="form-container">
+                        <!-- Insert Form -->
+                        <form action="{{ url_for('insert_record', table_name=table_name) }}" method="POST">
+                            <h4>Insert New Record</h4>
+                            {% for column in column_names %}
+                                <label for="{{ column }}">{{ column }}</label>
+                                <input type="text" name="{{ column }}" id="{{ column }}" required>
+                            {% endfor %}
+                            <button type="submit">Insert</button>
+                        </form>
+
+                        <!-- Delete Form -->
+                        <form action="{{ url_for('delete_record', table_name=table_name) }}" method="POST">
+                            <h4>Delete Record</h4>
+                            <label for="id">ID:</label>
+                            <input type="text" name="id" id="id" required>
+                            <button type="submit">Delete</button>
+                        </form>
+
+                        <!-- Update Form -->
+                        <form action="{{ url_for('update_record', table_name=table_name) }}" method="POST">
+                            <h4>Update Record</h4>
+                            {% for column in column_names %}
+                                <label for="{{ column }}">{{ column }}</label>
+                                <input type="text" name="{{ column }}" id="{{ column }}">
+                            {% endfor %}
+                            <button type="submit">Update</button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            {% else %}
+                <h1>Police Department Hardware Inventory</h1>
+            {% endif %}
+
+            <!-- Plots Section -->
+            <div id="plots">
+                <h1>Cost Savings Analysis</h1>
+                <div class="grid-container">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='bar_plot.png') }}" alt="Cost Savings Per Model">
+                    </div>
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='cumulative_savings.png') }}" alt="Cumulative Savings Over Models">
+                    </div>
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='pie_chart.png') }}" alt="Proportion of Savings Across Models">
+                    </div>
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='heatmap.png') }}" alt="Savings Breakdown Heatmap">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='main_scripts.js') }}"></script>
+    
+    <script>
+        function showPlots() {
+            // Hide all other content if necessary
+            document.querySelector('.main-content').style.display = 'none'; // Hide main content
+            document.getElementById('cost-savings-plots').style.display = 'block'; // Show plots
+        }
+
+        // Optional: You can also provide a way to go back to the main content
+        function goBack() {
+            document.querySelector('.main-content').style.display = 'block'; // Show main content
+            document.getElementById('cost-savings-plots').style.display = 'none'; // Hide plots
+        }
+    </script>
+</body>
+</html>

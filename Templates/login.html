@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login_styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-section">
+            <h1>Login</h1>
+            <form method="POST">
+                <label for="batch_number">Batch Number</label>
+                <input type="text" id="batch_number" name="batch_number" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
